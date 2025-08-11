@@ -44,6 +44,7 @@ export class AppComponent implements AfterViewInit {
   batchImportStatus = '';
   importInProgress = false;
   cancelImportFlag = false;
+  ytDlpOptionsUpdateTime: string | null = null;
   ytDlpVersion: string | null = null;
   metubeVersion: string | null = null;
   isAdvancedOpen = false;
@@ -107,6 +108,7 @@ export class AppComponent implements AfterViewInit {
 
   ngOnInit() {
     this.getConfiguration();
+    this.getYtdlOptionsUpdateTime();
     this.customDirs$ = this.getMatchingCustomDir();
     this.setTheme(this.activeTheme);
 
@@ -180,6 +182,18 @@ export class AppComponent implements AfterViewInit {
     );
   }
 
+  getYtdlOptionsUpdateTime() {
+    this.downloads.ytdlOptionsChanged.subscribe({
+      next: (data) => {
+        if (data['success']){
+          const date = new Date(data['update_time'] * 1000);
+          this.ytDlpOptionsUpdateTime=date.toLocaleString();
+        }else{
+          alert("Error reload yt-dlp options: "+data['msg']);
+        }
+      }
+    });
+  }
   getConfiguration() {
     this.downloads.configurationChanged.subscribe({
       next: (config) => {
